@@ -6,6 +6,7 @@ from flask import Flask, request
 from XenServer import Session, Failure
 import time
 import json
+import provision
 
 app = Flask(__name__)
 
@@ -46,9 +47,9 @@ def getVMList():
         virtualMachines = []
         session = getServerSession()
         try:
-            vmList = session.xenapi.VM.get_all()
-            for vm in vmList :
-                record = session.xenapi.VM.get_record(vm)
+            vmRecs= session.xenapi.VM.get_all_records()
+            for vm in vmRecs :
+                record = vmRecs[vm]
                 if not(record["is_a_template"]) and not(record["is_control_domain"]):
                     vmInfo = dict()
                     vmInfo["name"] = record["name_label"]
@@ -208,16 +209,92 @@ def updateVmMemoryConfig(vm_uid):
         try :
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             if request.form.has_key('staticMax') :
-                session.xenapi.VM.set_memory_static_max(vmref, request.form['staticMax'])
+                session.xenapi.VM.set_memory_static_max(vmref, int(request.form['staticMax'])*1024*1024)
             if request.form.has_key('staticMin') :
-                session.xenapi.VM.set_memory_static_max(vmref, request.form['staticMin'])
+                session.xenapi.VM.set_memory_static_max(vmref, int(request.form['staticMin'])*1024*1024)
             if request.form.has_key('dynamicMax') :
-                session.xenapi.VM.set_memory_dynamic_min(vmref, request.form['dynamicMax'])
+                session.xenapi.VM.set_memory_dynamic_min(vmref, int(request.form['dynamicMax'])*1024*1024)
             if request.form.has_key('dynamicMin') :
-                session.xenapi.VM.set_memory_dynamic_max(vmref, request.form['dynamicMin'])
+                session.xenapi.VM.set_memory_dynamic_max(vmref, int(request.form['dynamicMin'])*1024*1024)
         except Failure as error:
             return str(error)
         return json.dumps("Success")
+    
+@app.route("/mobilexencenter/virtualmachines/templates", methods=['POST'])
+def getTemplates():
+    if request.method == 'POST':
+        templates = []
+        try:
+            session = getServerSession()    
+            vmrecords = session.xenapi.VM.get_all_records()
+            for vm in vmrecords: 
+                record = vmrecords[vm]
+                if record["is_a_template"]:
+                    templateInfo = dict()
+                    templateInfo['uuid'] = record['uuid']
+                    templateInfo["name"] = record['name_label']
+                    templates.append(templateInfo)
+        except Failure as error:
+            return str(error)
+        return json.dumps(templates)
+    
+@app.route("/mobilexencenter/virtualmachines/templates/<templateId>/clone", methods=['POST'])
+def cloneTemplate(templateId):
+    if request.method == 'POST':
+        try:
+            session = getServerSession()    
+            template = session.xenapi.VM.get_by_uuid(templateId)
+            newVmName = request.form['newvmname']
+            vm = session.xenapi.VM.clone(template, newVmName)
+            pifs = session.xenapi.PIF.get_all_records()
+            lowest = None
+            for pifRef in pifs.keys():
+                if (lowest is None) or (pifs[pifRef]['device'] < pifs[lowest]['device']):
+                    lowest = pifRef
+            network = session.xenapi.PIF.get_network(lowest)
+            vif = { 'device': '0',
+                    'network': network,
+                    'VM': vm,
+                    'MAC': "",
+                    'MTU': "1500",
+                    "qos_algorithm_type": "",
+                    "qos_algorithm_params": {},
+                    "other_config": {} }
+            session.xenapi.VIF.create(vif)
+            session.xenapi.VM.set_PV_args(vm, "noninteractive")
+            pool = session.xenapi.pool.get_all()[0]
+            default_sr = session.xenapi.pool.get_default_SR(pool)
+            default_sr = session.xenapi.SR.get_record(default_sr)
+            spec = provision.getProvisionSpec(session, vm)
+            spec.setSR(default_sr['uuid'])
+            provision.setProvisionSpec(session, vm, spec)
+            session.xenapi.VM.provision(vm)    
+            if request.form.has_key('description'):
+                session.xenapi.VM.set_name_description(vm, request.form['description'])
+            otherconfig = dict()
+            if request.form.has_key('installurl'):
+                otherconfig['install-repository'] = request.form['installurl']
+            session.xenapi.VM.set_other_config(vm, otherconfig)
+            if request.form.has_key('initialmemory'):
+                memValue = str(int(request.form['initialmemory'])*1024*1024)
+                session.xenapi.VM.set_memory_limits(vm, memValue, memValue, memValue, memValue)
+            if request.form.has_key('vcpus'):
+                session.xenapi.VM.set_VCPUs_at_startup(vm, request.form['vcpus'])
+#            session.xenapi.VM.start(vm, False, True)
+        except Failure as error:
+            return str(error)
+        return json.dumps("Success")
+    
+@app.route("/mobilexencenter/virtualmachines/<vmId>/delete", methods=['POST'])
+def deleteVM(vmId):
+    if request.method == 'POST':
+        try:
+            session = getServerSession()
+            vm = session.xenapi.VM.get_by_uuid(vmId)    
+            session.xenapi.VM.destroy(vm)
+        except Failure as error:
+            return str(error)
+        return json.dumps("Deleted")
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0", port=8000)
