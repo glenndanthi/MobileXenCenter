@@ -186,10 +186,25 @@ def suspend(vm_uid):
         return json.dumps(result) 
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/memory", methods=['POST'])
-def getVmMemoryDetails(vm_uid):
+def getVmMemoryConfig(vm_uid):
     if request.method == 'POST':
         session = getServerSession()    
         memInfo = dict()
+        try :
+            vmref = session.xenapi.VM.get_by_uuid(vm_uid)         
+            vmrec = session.xenapi.VM.get_record(vmref)
+            memInfo['staticMax'] = vmrec["memory_static_max"]
+            memInfo['staticMin'] = vmrec["memory_static_min"]
+            memInfo['dynamicMax'] = vmrec["memory_dynamic_max"]
+            memInfo['dynamicMin'] = vmrec["memory_dynamic_min"]            
+        except Failure as error:
+            return str(error)
+        return json.dumps(memInfo)
+
+@app.route("/mobilexencenter/virtualmachines/<vm_uid>/memory/update", methods=['POST'])
+def updateVmMemoryConfig(vm_uid):
+    if request.method == 'POST':
+        session = getServerSession()
         try :
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             if request.form.has_key('staticMax') :
@@ -200,14 +215,9 @@ def getVmMemoryDetails(vm_uid):
                 session.xenapi.VM.set_memory_dynamic_min(vmref, request.form['dynamicMax'])
             if request.form.has_key('dynamicMin') :
                 session.xenapi.VM.set_memory_dynamic_max(vmref, request.form['dynamicMin'])
-            vmrec = session.xenapi.VM.get_record(vmref)
-            memInfo['staticMax'] = vmrec["memory_static_max"]
-            memInfo['staticMin'] = vmrec["memory_static_min"]
-            memInfo['dynamicMax'] = vmrec["memory_dynamic_max"]
-            memInfo['dynamicMin'] = vmrec["memory_dynamic_min"]            
         except Failure as error:
             return str(error)
-        return json.dumps(memInfo)
+        return json.dumps("Success")
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0", port=8000)
