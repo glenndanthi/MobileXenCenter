@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+    		<RelativeLayout android:id="@+id/toolbar"
+		    style="@style/Toolbar"
+		        xmlns:android="http://schemas.android.com/apk/res/android">
+		        <ImageButton android:id="@+id/newServer" style="@style/ToolbarButton" android:src="@drawable/add_server" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_marginLeft="7dp"></ImageButton>
+		        <ImageButton android:id="@+id/newVM" style="@style/ToolbarButton" android:src="@drawable/add_vm" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/newServer"></ImageButton>
+		        <ImageButton android:id="@+id/start" style="@style/ToolbarButton" android:src="@drawable/poweron" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/newVM"></ImageButton>
+		        <ImageButton android:id="@+id/shutDown" style="@style/ToolbarButton" android:src="@drawable/shutdown" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/start"></ImageButton>
+		        <ImageButton android:id="@+id/reboot" style="@style/ToolbarButton" android:src="@drawable/restart" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/shutDown"></ImageButton>
+		        <ImageButton android:id="@+id/suspend" style="@style/ToolbarButton" android:src="@drawable/suspend" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/reboot"></ImageButton>
+		        <ImageButton android:id="@+id/resume" style="@style/ToolbarButton" android:src="@drawable/resume" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/suspend"></ImageButton>
+			</RelativeLayout>
+			
+			<TableLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="1">
+
+        <TableRow>
+            <FrameLayout 
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1">
+
+                <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                	<ImageView
+        android:id="@+id/icon"
+        android:layout_width="22px"
+        android:layout_height="22px"
+        android:layout_marginLeft="4px"
+        android:layout_marginRight="10px"
+        android:layout_marginTop="4px"
+        android:src="@drawable/add_server" >
+    </ImageView>
+
+    <TextView
+        android:id="@+id/label11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@+id/label"
+        android:textSize="20px" >
+    </TextView>
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout 
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1">
+                <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                <ImageView android:layout_width="wrap_content" 
+                    android:layout_height="wrap_content" 
+                    android:src="@drawable/suspend" 
+                    android:id="@+id/buttonShareFavoriteRecipe"
+                    android:onClick="onClickShareFavoriteRecipe"
+                    android:layout_gravity="center_horizontal">
+                </ImageView>
+                
+                <ImageView android:layout_width="wrap_content" 
+                    android:layout_height="wrap_content" 
+                    android:src="@drawable/suspend" 
+                    android:id="@+id/buttonShareFavoriteRecipe"
+                    android:onClick="onClickShareFavoriteRecipe"
+                    android:layout_gravity="center_horizontal">
+                </ImageView>
+                </LinearLayout>
+                
+                </FrameLayout>
+            </TableRow>
+
+    </TableLayout>
+  
+    </LinearLayout>
+    
+</ScrollView>

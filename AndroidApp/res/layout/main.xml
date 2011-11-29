@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <TextView
+        android:id="@+id/labelIP"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Server IP:"/>
+    <EditText
+        android:id="@+id/entryIP"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/editbox_background"
+        android:layout_below="@id/labelIP"/>
+    
+    <TextView
+        android:id="@+id/labelUser"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Username:"
+        android:layout_below="@id/entryIP"/>
+    <EditText
+        android:id="@+id/entryUser"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/editbox_background"
+        android:layout_below="@id/labelUser"/>
+    <TextView
+        android:id="@+id/labelPass"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entryUser"
+        android:text="Password:"/>
+    <EditText
+        android:id="@+id/entryPass"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:password="true"
+        android:background="@android:drawable/editbox_background"
+        android:layout_below="@id/labelPass"/>
+    <Button
+        android:id="@+id/login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entryPass"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dip"
+        android:text="Login" />
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/login"
+        android:layout_alignTop="@id/login"
+        android:text="Cancel" />
+</RelativeLayout>
