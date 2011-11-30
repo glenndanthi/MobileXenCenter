@@ -16,19 +16,16 @@ def getServerSession():
     password = request.form['password']
     if not serveraddress.startswith("http://"):
         serveraddress = "http://" + serveraddress
-    try :
-        session = Session(serveraddress)
-        session.login_with_password(username, password)
-        return session
-    except Failure as error:
-        return str(error)
+    session = Session(serveraddress)
+    session.login_with_password(username, password)
+    return session
 
 @app.route("/mobilexencenter/hosts", methods=['POST'])
 def getHostsList():
     if request.method == 'POST':
         hostList = []
-        session = getServerSession()
         try :
+            session = getServerSession()
             hostrecords = session.xenapi.host.get_all_records()
             for hostref in hostrecords.keys():
                 hostrec = hostrecords[hostref] 
@@ -37,7 +34,7 @@ def getHostsList():
                 hostInfo["name"] = hostrec["name_label"]
                 hostList.append(hostInfo)
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(hostList)
 
 
@@ -45,8 +42,8 @@ def getHostsList():
 def getVMList():
     if request.method == 'POST':
         virtualMachines = []
-        session = getServerSession()
         try:
+            session = getServerSession()
             vmRecs= session.xenapi.VM.get_all_records()
             for vm in vmRecs :
                 record = vmRecs[vm]
@@ -57,15 +54,15 @@ def getVMList():
                     vmInfo['state'] = record["power_state"]
                     virtualMachines.append(vmInfo)
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(virtualMachines)
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/generalInfo", methods=['POST'])
 def getVMInfo(vm_uid):
     if request.method == 'POST':
         vmInfo = dict()
-        session = getServerSession()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             vmrec = session.xenapi.VM.get_record(vmref)
             vmInfo["name"] = vmrec["name_label"]
@@ -73,15 +70,15 @@ def getVMInfo(vm_uid):
             vmInfo["memory"] = vmrec["memory_target"]
             vmInfo['vcpuCount'] = vmrec["VCPUs_max"]
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(vmInfo)
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/start", methods=['POST'])
 def startVm(vm_uid):
     if request.method == 'POST':
-        result = dict()
-        session = getServerSession()
+        result = dict()      
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             session.xenapi.Async.VM.start(vmref, False, True)
             task = session.xenapi.Async.VM.start(vmref, False, True)
@@ -90,18 +87,18 @@ def startVm(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info'][0]
-            result['host'] = session.xenapi.host.get_name_label(task_record['resident_on'])
+                result['errorInfo'] = task_record['error_info']
+#            result['host'] = session.xenapi.host.get_name_label(task_record['resident_on'])
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(result)    
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/stop", methods=['POST'])
 def stopVm(vm_uid):
     if request.method == 'POST':
         result = dict()
-        session = getServerSession()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             task = session.xenapi.Async.VM.clean_shutdown(vmref)
             task_record = session.xenapi.task.get_record(task)
@@ -109,17 +106,17 @@ def stopVm(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info'][0]
+                result['errorInfo'] = task_record['error_info']
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(result)  
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/resume", methods=['POST'])
 def resumeVm(vm_uid):
     if request.method == 'POST':
         result = dict()
-        session = getServerSession()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             task = session.xenapi.Async.VM.resume(vmref, False, True)
             task_record = session.xenapi.task.get_record(task)
@@ -127,17 +124,17 @@ def resumeVm(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info'][0]
+                result['errorInfo'] = task_record['error_info']
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(result)  
  
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/pause", methods=['POST'])
 def pause(vm_uid):
     if request.method == 'POST':
         result = dict()
-        session = getServerSession()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             task = session.xenapi.Async.VM.pause(vmref)
             task_record = session.xenapi.task.get_record(task)
@@ -145,17 +142,17 @@ def pause(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info'][0]
+                result['errorInfo'] = task_record['error_info']
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(result) 
    
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/unpause", methods=['POST'])
 def unpause(vm_uid):
     if request.method == 'POST':
         result = dict()
-        session = getServerSession()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             task = session.xenapi.Async.VM.unpause(vmref)
             task_record = session.xenapi.task.get_record(task)
@@ -163,17 +160,17 @@ def unpause(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info'][0]
+                result['errorInfo'] = task_record['error_info']
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(result) 
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/suspend", methods=['POST'])
 def suspend(vm_uid):
     if request.method == 'POST':
         result = dict()
-        session = getServerSession()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             task = session.xenapi.Async.VM.suspend(vmref)
             task_record = session.xenapi.task.get_record(task)
@@ -181,17 +178,17 @@ def suspend(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info'][0]
+                result['errorInfo'] = task_record['error_info']
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(result) 
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/memory", methods=['POST'])
 def getVmMemoryConfig(vm_uid):
     if request.method == 'POST':
-        session = getServerSession()    
         memInfo = dict()
         try :
+            session = getServerSession()    
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)         
             vmrec = session.xenapi.VM.get_record(vmref)
             memInfo['staticMax'] = vmrec["memory_static_max"]
@@ -199,14 +196,15 @@ def getVmMemoryConfig(vm_uid):
             memInfo['dynamicMax'] = vmrec["memory_dynamic_max"]
             memInfo['dynamicMin'] = vmrec["memory_dynamic_min"]            
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(memInfo)
 
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/memory/update", methods=['POST'])
 def updateVmMemoryConfig(vm_uid):
     if request.method == 'POST':
-        session = getServerSession()
+        result = dict()
         try :
+            session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
             if request.form.has_key('staticMax') :
                 session.xenapi.VM.set_memory_static_max(vmref, int(request.form['staticMax'])*1024*1024)
@@ -216,9 +214,10 @@ def updateVmMemoryConfig(vm_uid):
                 session.xenapi.VM.set_memory_dynamic_min(vmref, int(request.form['dynamicMax'])*1024*1024)
             if request.form.has_key('dynamicMin') :
                 session.xenapi.VM.set_memory_dynamic_max(vmref, int(request.form['dynamicMin'])*1024*1024)
+            result['status'] = "success"
         except Failure as error:
-            return str(error)
-        return json.dumps("Success")
+            return str(error), 400
+        return json.dumps(result)
     
 @app.route("/mobilexencenter/virtualmachines/templates", methods=['POST'])
 def getTemplates():
@@ -235,16 +234,17 @@ def getTemplates():
                     templateInfo["name"] = record['name_label']
                     templates.append(templateInfo)
         except Failure as error:
-            return str(error)
+            return str(error), 400
         return json.dumps(templates)
     
-@app.route("/mobilexencenter/virtualmachines/templates/<templateId>/clone", methods=['POST'])
-def cloneTemplate(templateId):
+@app.route("/mobilexencenter/virtualmachines/<vmId>/clone", methods=['POST'])
+def cloneVm(vmId):
     if request.method == 'POST':
+        result = dict()
         try:
             session = getServerSession()    
-            template = session.xenapi.VM.get_by_uuid(templateId)
-            newVmName = request.form['newvmname']
+            template = session.xenapi.VM.get_by_uuid(vmId)
+            newVmName = request.form.get('newvmname', 'newVm')
             vm = session.xenapi.VM.clone(template, newVmName)
             pifs = session.xenapi.PIF.get_all_records()
             lowest = None
@@ -281,20 +281,23 @@ def cloneTemplate(templateId):
             if request.form.has_key('vcpus'):
                 session.xenapi.VM.set_VCPUs_at_startup(vm, request.form['vcpus'])
 #            session.xenapi.VM.start(vm, False, True)
+            result['status'] = "success"
         except Failure as error:
-            return str(error)
-        return json.dumps("Success")
+            return str(error), 400
+        return json.dumps(result)
     
 @app.route("/mobilexencenter/virtualmachines/<vmId>/delete", methods=['POST'])
 def deleteVM(vmId):
     if request.method == 'POST':
+        result = dict()
         try:
             session = getServerSession()
             vm = session.xenapi.VM.get_by_uuid(vmId)    
             session.xenapi.VM.destroy(vm)
+            result['status'] = "success"
         except Failure as error:
-            return str(error)
-        return json.dumps("Deleted")
+            return str(error), 400
+        return json.dumps(result)
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0", port=8000)
