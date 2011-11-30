@@ -269,8 +269,7 @@ def cloneVm(vmId):
             spec.setSR(default_sr['uuid'])
             provision.setProvisionSpec(session, vm, spec)
             session.xenapi.VM.provision(vm)    
-            if request.form.has_key('description'):
-                session.xenapi.VM.set_name_description(vm, request.form['description'])
+            session.xenapi.VM.set_name_description(vm, request.form.get('description', ''))
             otherconfig = dict()
             if request.form.has_key('installurl'):
                 otherconfig['install-repository'] = request.form['installurl']
