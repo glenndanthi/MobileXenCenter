@@ -295,6 +295,38 @@ def deleteVM(vmId):
             result['errorInfo'] = str(error)
             return json.dumps(result), 400
         return json.dumps(result)
+    
+@app.route("/mobilexencenter/hosts/<hostId>/reboot", methods=['POST'])
+def rebootHost(hostId):
+    if request.method == 'POST':
+        result = dict()
+        try:
+            session = getServerSession()
+            host = session.xenapi.host.get_by_uuid(hostId)
+            session.xenapi.host.disable(host) 
+            session.xenapi.host.reboot(host)
+            result['status'] = "success"
+        except Failure as error:
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
+        return json.dumps(result)
+
+@app.route("/mobilexencenter/hosts/<hostId>/shutdown", methods=['POST'])
+def shutdownHost(hostId):
+    if request.method == 'POST':
+        result = dict()
+        try:
+            session = getServerSession()
+            host = session.xenapi.host.get_by_uuid(hostId)
+            session.xenapi.host.disable(host) 
+            session.xenapi.host.shutdown(host)
+            result['status'] = "success"
+        except Failure as error:
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
+        return json.dumps(result)
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0", port=8000)
