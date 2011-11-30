@@ -191,10 +191,10 @@ def getVmMemoryConfig(vm_uid):
             session = getServerSession()    
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)         
             vmrec = session.xenapi.VM.get_record(vmref)
-            memInfo['staticMax'] = vmrec["memory_static_max"]
-            memInfo['staticMin'] = vmrec["memory_static_min"]
-            memInfo['dynamicMax'] = vmrec["memory_dynamic_max"]
-            memInfo['dynamicMin'] = vmrec["memory_dynamic_min"]            
+            memInfo['staticMax'] = int(vmrec["memory_static_max"])/1024/1024
+            memInfo['staticMin'] = int(vmrec["memory_static_min"])/1024/1024
+            memInfo['dynamicMax'] = int(vmrec["memory_dynamic_max"])/1024/1024
+            memInfo['dynamicMin'] = int(vmrec["memory_dynamic_min"])/1024/1024            
         except Failure as error:
             return str(error), 400
         return json.dumps(memInfo)
@@ -206,17 +206,12 @@ def updateVmMemoryConfig(vm_uid):
         try :
             session = getServerSession()
             vmref = session.xenapi.VM.get_by_uuid(vm_uid)
-            if request.form.has_key('staticMax') :
-                session.xenapi.VM.set_memory_static_max(vmref, int(request.form['staticMax'])*1024*1024)
-            if request.form.has_key('staticMin') :
-                session.xenapi.VM.set_memory_static_max(vmref, int(request.form['staticMin'])*1024*1024)
-            if request.form.has_key('dynamicMax') :
-                session.xenapi.VM.set_memory_dynamic_min(vmref, int(request.form['dynamicMax'])*1024*1024)
-            if request.form.has_key('dynamicMin') :
-                session.xenapi.VM.set_memory_dynamic_max(vmref, int(request.form['dynamicMin'])*1024*1024)
+            session.xenapi.VM.set_memory_limits(vmref, str(int(request.form['staticMin'])*1024*1024), str(int(request.form['staticMax'])*1024*1024), str(int(request.form['dynamicMin'])*1024*1024), str(int(request.form['dynamicMax'])*1024*1024))
             result['status'] = "success"
         except Failure as error:
-            return str(error), 400
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
         return json.dumps(result)
     
 @app.route("/mobilexencenter/virtualmachines/templates", methods=['POST'])
@@ -271,8 +266,7 @@ def cloneVm(vmId):
             session.xenapi.VM.provision(vm)    
             session.xenapi.VM.set_name_description(vm, request.form.get('description', ''))
             otherconfig = dict()
-            if request.form.has_key('installurl'):
-                otherconfig['install-repository'] = request.form['installurl']
+            otherconfig['install-repository'] = request.form.get('installurl', 'cdrom')
             session.xenapi.VM.set_other_config(vm, otherconfig)
             if request.form.has_key('initialmemory'):
                 memValue = str(int(request.form['initialmemory'])*1024*1024)
@@ -282,7 +276,9 @@ def cloneVm(vmId):
 #            session.xenapi.VM.start(vm, False, True)
             result['status'] = "success"
         except Failure as error:
-            return str(error), 400
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
         return json.dumps(result)
     
 @app.route("/mobilexencenter/virtualmachines/<vmId>/delete", methods=['POST'])
@@ -295,7 +291,9 @@ def deleteVM(vmId):
             session.xenapi.VM.destroy(vm)
             result['status'] = "success"
         except Failure as error:
-            return str(error), 400
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
         return json.dumps(result)
 
 if __name__ == "__main__":
