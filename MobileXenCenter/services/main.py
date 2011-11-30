@@ -73,6 +73,20 @@ def getVMInfo(vm_uid):
             return str(error), 400
         return json.dumps(vmInfo)
     
+@app.route("/mobilexencenter/virtualmachines/<vm_uid>/generalInfo/update", methods=['POST'])
+def setVMInfo(vm_uid):
+    if request.method == 'POST':
+        result = dict()
+        try :
+            session = getServerSession()
+            vmref = session.xenapi.VM.get_by_uuid(vm_uid)
+            session.xenapi.VM.set_name_label(vmref, request.form.get('name',''))
+            session.xenapi.VM.set_name_description(vmref, request.form.get('description',''))
+            result['status'] = "success"
+        except Failure as error:
+            return str(error), 400
+        return json.dumps(result)
+    
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/start", methods=['POST'])
 def startVm(vm_uid):
     if request.method == 'POST':
