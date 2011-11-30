@@ -67,7 +67,7 @@ def getVMInfo(vm_uid):
             vmrec = session.xenapi.VM.get_record(vmref)
             vmInfo["name"] = vmrec["name_label"]
             vmInfo['description'] = vmrec["name_description"]
-            vmInfo["memory"] = vmrec["memory_target"]
+            vmInfo["memory"] = int(vmrec["memory_target"])/1024/1024
             vmInfo['vcpuCount'] = vmrec["VCPUs_max"]
         except Failure as error:
             return str(error), 400
