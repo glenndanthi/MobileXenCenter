@@ -8,6 +8,9 @@
 package manager.ui;
 
 public final class R {
+    public static final class array {
+        public static final int template_array=0x7f050000;
+    }
     public static final class attr {
     }
     public static final class drawable {
@@ -20,46 +23,91 @@ public final class R {
         public static final int shutdown=0x7f020006;
         public static final int suspend=0x7f020007;
         public static final int toolbar_background=0x7f020008;
+        public static final int tree_connected_16=0x7f020009;
+        public static final int tree_disabled_16=0x7f02000a;
+        public static final int tree_disconnected_16=0x7f02000b;
+        public static final int tree_halted_16=0x7f02000c;
+        public static final int tree_paused_16=0x7f02000d;
+        public static final int tree_running_16=0x7f02000e;
+        public static final int tree_starting_16=0x7f02000f;
+        public static final int tree_stopped_16=0x7f020010;
+        public static final int tree_suspended_16=0x7f020011;
     }
     public static final class id {
-        public static final int ImageView01=0x7f060003;
-        public static final int LinearLayout01=0x7f060002;
-        public static final int blannk=0x7f060014;
-        public static final int buttonShareFavoriteRecipe=0x7f06001b;
-        public static final int cancel=0x7f06000c;
-        public static final int check=0x7f060001;
-        public static final int entryIP=0x7f060006;
-        public static final int entryPass=0x7f06000a;
-        public static final int entryUser=0x7f060008;
-        public static final int icon=0x7f060015;
-        public static final int label=0x7f060016;
-        public static final int label11=0x7f06001a;
-        public static final int labelIP=0x7f060005;
-        public static final int labelPass=0x7f060009;
-        public static final int labelUser=0x7f060007;
-        public static final int listView=0x7f06000d;
-        public static final int login=0x7f06000b;
-        public static final int logout=0x7f060013;
-        public static final int newServer=0x7f060017;
-        public static final int newVM=0x7f06000f;
-        public static final int reboot=0x7f060012;
-        public static final int resume=0x7f060019;
-        public static final int shutDown=0x7f060011;
-        public static final int start=0x7f060010;
-        public static final int suspend=0x7f060018;
-        public static final int toolbar=0x7f06000e;
-        public static final int tvChild=0x7f060000;
-        public static final int tvGroup=0x7f060004;
+        public static final int ImageView01=0x7f070015;
+        public static final int LinearLayout01=0x7f070014;
+        public static final int blannk=0x7f070026;
+        public static final int buttonBack=0x7f070011;
+        public static final int buttonShareFavoriteRecipe=0x7f07002e;
+        public static final int buttonUpdateGeneral=0x7f070032;
+        public static final int buttonUpdateMemory=0x7f070010;
+        public static final int cancel=0x7f07001e;
+        public static final int check=0x7f070013;
+        public static final int delete=0x7f070022;
+        public static final int editTextCpuCount=0x7f07000b;
+        public static final int editTextDynamicMax=0x7f07003e;
+        public static final int editTextDynamicMin=0x7f07003b;
+        public static final int editTextMemory=0x7f07000e;
+        public static final int editTextStaticMax=0x7f070038;
+        public static final int editTextStaticMin=0x7f070035;
+        public static final int editTextVmDesc=0x7f070006;
+        public static final int editTextVmName=0x7f070003;
+        public static final int entryIP=0x7f070018;
+        public static final int entryPass=0x7f07001c;
+        public static final int entryUser=0x7f07001a;
+        public static final int icon=0x7f070027;
+        public static final int l1=0x7f070001;
+        public static final int l2=0x7f070004;
+        public static final int l3=0x7f07000a;
+        public static final int l33=0x7f07000f;
+        public static final int l4=0x7f07000c;
+        public static final int l5=0x7f070033;
+        public static final int l6=0x7f070036;
+        public static final int l7=0x7f070039;
+        public static final int l8=0x7f07003c;
+        public static final int label=0x7f070028;
+        public static final int label11=0x7f07002d;
+        public static final int labelCpuCount=0x7f070009;
+        public static final int labelDynamicMax=0x7f07003d;
+        public static final int labelDynamicMin=0x7f07003a;
+        public static final int labelGeneral=0x7f070000;
+        public static final int labelIP=0x7f070017;
+        public static final int labelMemory=0x7f07000d;
+        public static final int labelPass=0x7f07001b;
+        public static final int labelStaticMax=0x7f070037;
+        public static final int labelStaticMin=0x7f070034;
+        public static final int labelTemplate=0x7f070007;
+        public static final int labelUser=0x7f070019;
+        public static final int labelVmDesc=0x7f070005;
+        public static final int labelVmName=0x7f070002;
+        public static final int listView=0x7f07001f;
+        public static final int login=0x7f07001d;
+        public static final int logout=0x7f070025;
+        public static final int newServer=0x7f070029;
+        public static final int newVM=0x7f070021;
+        public static final int pause=0x7f070030;
+        public static final int reboot=0x7f070024;
+        public static final int resume=0x7f07002c;
+        public static final int shutDown=0x7f070023;
+        public static final int spinner1=0x7f070008;
+        public static final int start=0x7f07002a;
+        public static final int stop=0x7f07002f;
+        public static final int suspend=0x7f07002b;
+        public static final int toolbar=0x7f070020;
+        public static final int tvChild=0x7f070012;
+        public static final int tvGroup=0x7f070016;
+        public static final int unpause=0x7f070031;
     }
     public static final class layout {
-        public static final int child_layout=0x7f030000;
-        public static final int group_layout=0x7f030001;
-        public static final int main=0x7f030002;
-        public static final int main2=0x7f030003;
-        public static final int manager_ui=0x7f030004;
-        public static final int rowbuttonlayout=0x7f030005;
-        public static final int testlayout=0x7f030006;
-        public static final int vmdetails=0x7f030007;
+        public static final int add_vm=0x7f030000;
+        public static final int child_layout=0x7f030001;
+        public static final int group_layout=0x7f030002;
+        public static final int main=0x7f030003;
+        public static final int main2=0x7f030004;
+        public static final int manager_ui=0x7f030005;
+        public static final int rowbuttonlayout=0x7f030006;
+        public static final int testlayout=0x7f030007;
+        public static final int vmdetails=0x7f030008;
     }
     public static final class string {
         public static final int app_name=0x7f040001;
@@ -67,8 +115,11 @@ public final class R {
         public static final int hello=0x7f040000;
     }
     public static final class style {
-        public static final int Toolbar=0x7f050000;
-        public static final int ToolbarButton=0x7f050001;
-        public static final int ToolbarButtonRight=0x7f050002;
+        public static final int Toolbar=0x7f060000;
+        public static final int ToolbarButton=0x7f060001;
+        public static final int ToolbarButtonLarge=0x7f060002;
+        public static final int ToolbarButtonLargest=0x7f060004;
+        public static final int ToolbarButtonRight=0x7f060005;
+        public static final int ToolbarButtonSmall=0x7f060003;
     }
 }
