@@ -67,11 +67,25 @@ def getVMInfo(vm_uid):
             vmrec = session.xenapi.VM.get_record(vmref)
             vmInfo["name"] = vmrec["name_label"]
             vmInfo['description'] = vmrec["name_description"]
-            vmInfo["memory"] = vmrec["memory_target"]
+            vmInfo["memory"] = int(vmrec["memory_target"])/1024/1024
             vmInfo['vcpuCount'] = vmrec["VCPUs_max"]
         except Failure as error:
             return str(error), 400
         return json.dumps(vmInfo)
+    
+@app.route("/mobilexencenter/virtualmachines/<vm_uid>/generalInfo/update", methods=['POST'])
+def setVMInfo(vm_uid):
+    if request.method == 'POST':
+        result = dict()
+        try :
+            session = getServerSession()
+            vmref = session.xenapi.VM.get_by_uuid(vm_uid)
+            session.xenapi.VM.set_name_label(vmref, request.form.get('name',''))
+            session.xenapi.VM.set_name_description(vmref, request.form.get('description',''))
+            result['status'] = "success"
+        except Failure as error:
+            return str(error), 400
+        return json.dumps(result)
     
 @app.route("/mobilexencenter/virtualmachines/<vm_uid>/start", methods=['POST'])
 def startVm(vm_uid):
@@ -289,6 +303,38 @@ def deleteVM(vmId):
             session = getServerSession()
             vm = session.xenapi.VM.get_by_uuid(vmId)    
             session.xenapi.VM.destroy(vm)
+            result['status'] = "success"
+        except Failure as error:
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
+        return json.dumps(result)
+    
+@app.route("/mobilexencenter/hosts/<hostId>/reboot", methods=['POST'])
+def rebootHost(hostId):
+    if request.method == 'POST':
+        result = dict()
+        try:
+            session = getServerSession()
+            host = session.xenapi.host.get_by_uuid(hostId)
+            session.xenapi.host.disable(host) 
+            session.xenapi.host.reboot(host)
+            result['status'] = "success"
+        except Failure as error:
+            result['status'] = "failure"
+            result['errorInfo'] = str(error)
+            return json.dumps(result), 400
+        return json.dumps(result)
+
+@app.route("/mobilexencenter/hosts/<hostId>/shutdown", methods=['POST'])
+def shutdownHost(hostId):
+    if request.method == 'POST':
+        result = dict()
+        try:
+            session = getServerSession()
+            host = session.xenapi.host.get_by_uuid(hostId)
+            session.xenapi.host.disable(host) 
+            session.xenapi.host.shutdown(host)
             result['status'] = "success"
         except Failure as error:
             result['status'] = "failure"
