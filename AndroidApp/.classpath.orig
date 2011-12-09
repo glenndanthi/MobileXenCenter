@@ -3,7 +3,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+<<<<<<< HEAD
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="external/gson-2.0.jar"/>
+=======
+	<classpathentry kind="lib" path="E:/ASU/VandCC/xenmanagerV1/src/google-gson-2.0/gson-2.0.jar"/>
+>>>>>>> branch 'master' of git@github.com:glenndanthi/MobileXenCenter.git
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
