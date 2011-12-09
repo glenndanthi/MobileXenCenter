@@ -3,4 +3,11 @@
     <string name="hello">Hello World, XenmanagerActivity!</string>
     <string name="app_name">Mobile Xen Manager</string>
     <string name="create_server">Add New Server</string>
+    
+        
+        <string-array name="template_array">
+			<item>Ubuntu 10.4</item>
+			<item>Cent OS 5</item>
+			<item>Debian 2</item>
+        </string-array>
 </resources>

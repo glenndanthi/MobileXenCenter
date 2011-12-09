@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 
+import manager.ui.ApplicationUI;
 import manager.ui.AsyncTaskDemo;
 import manager.ui.R;
 import manager.ui.SampleActivity;
@@ -9,17 +10,21 @@ import manager.ui.VMDetailsActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
-
+	VirtualMachine vmSaved;
     @Override
     public boolean areAllItemsEnabled()
     {
@@ -29,24 +34,39 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
 
     private ArrayList<String> groups;
-
-    private ArrayList<ArrayList<VM>> children;
+    private ApplicationUI storedUi;
+    private ArrayList<ArrayList<VirtualMachine>> children;
 
     public ExpandableListAdapter(Context context, ArrayList<String> groups,
-            ArrayList<ArrayList<VM>> children) {
+            ArrayList<ArrayList<VirtualMachine>> children, ApplicationUI ui) {
         this.context = context;
         this.groups = groups;
         this.children = children;
+        this.storedUi = ui;
     }
 
+    
+    public void removeItem(String uid){
+    	//Log.v("test", "UID:"+uid+"  child size= "+children.size()+" child 1st size "+children.get(0).size());
+    	
+    	for(int i=0;i<children.size();i++){
+    		for(int j=0;i<children.get(i).size();j++){
+    			if(children.get(i).get(j).getUid().compareTo(uid)==0){
+    				children.get(i).remove(j);
+    				break;
+    			}
+    		}
+    	}
+    }
    
-    public void addItem(VM virtualMachine) {
-        if (!groups.contains(virtualMachine.getGroup())) {
-            groups.add(virtualMachine.getGroup());
+    public void addItem(VirtualMachine virtualMachine) {
+    	
+        if (!groups.contains(ServerCredentials.getServerName())) {
+            groups.add(ServerCredentials.getServerName());
         }
-        int index = groups.indexOf(virtualMachine.getGroup());
+        int index = groups.indexOf(ServerCredentials.getServerName());
         if (children.size() < index + 1) {
-            children.add(new ArrayList<VM>());
+            children.add(new ArrayList<VirtualMachine>());
         }
         children.get(index).add(virtualMachine);
     }
@@ -66,26 +86,50 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
             View convertView, ViewGroup parent) {
     	
-    	VM virtualMachine = (VM) getChild(groupPosition, childPosition);
-        
+    	VirtualMachine vm = (VirtualMachine) getChild(groupPosition, childPosition);
+    	vmSaved = vm;
+    	Log.v("getChildView","Name: "+vm.getName()+"  UID: "+vm.getUid()+"  GP "+groupPosition+"  CP"+childPosition);
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.child_layout, null);
         }
+        final String s = vm.getUid();
+        
         CheckBox check = (CheckBox) convertView.findViewById(R.id.check);
+        check.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				// TODO Auto-generated method stub
+				if(isChecked){
+					ServerCredentials.selectedUID.add(s);
+				}else{
+					for(int i=0;i<ServerCredentials.selectedUID.size();i++){
+						if(ServerCredentials.selectedUID.get(i).compareTo(s)==0){
+							ServerCredentials.selectedUID.remove(i);
+							break;
+						}
+					}
+				}
+				//Toast.makeText(context,"Added: "+s+"    All="+all, Toast.LENGTH_LONG).show();
+				
+			}
+		});
+        
+        
+        
         TextView tv = (TextView) convertView.findViewById(R.id.tvChild);
-        tv.setText("   " + virtualMachine.getName());
+        tv.setText("   " + vm.getName());
+        
         // Adding Lister on Text View
         tv.setOnClickListener(new OnClickListener() {
-			
+        	
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				//Toast.makeText(context.getApplicationContext(), "Child clicked", Toast.LENGTH_LONG).show();
-				//SampleActivity sa = new SampleActivity();
-				//sa.startVMdetailsActivity();
-				startAct();
+				startAct(s);
+				//Toast.makeText(context,"  Name:"+s, Toast.LENGTH_LONG).show();
 			}
 		});
         
@@ -93,14 +137,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         
         // Depending upon the child type, set the imageTextView01
         tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        if (virtualMachine.getGroup().compareTo("VM Cluster 0")==0 ) {
-            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.poweron, 0, 0, 0);
-            check.setChecked(true);
-        } else if (virtualMachine.getGroup().compareTo("VM Cluster 1")==0 ) {
-            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.shutdown, 0, 0, 0);
-        } else if (virtualMachine.getGroup().compareTo("VM Cluster 2")==0 ) {
-            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.suspend, 0, 0, 0);
+        if (vm.getState().compareTo("Halted")==0 ) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tree_halted_16, 0, 0, 0);            
+        } else if (vm.getState().compareTo("Suspended")==0 ) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tree_suspended_16, 0, 0, 0);
+        } else if (vm.getState().compareTo("Running")==0 ) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tree_running_16, 0, 0, 0);
+        }else if (vm.getState().compareTo("Starting")==0 ) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tree_starting_16, 0, 0, 0);
+        }else if (vm.getState().compareTo("Stopped")==0 ) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tree_stopped_16, 0, 0, 0);
+        }else if (vm.getState().compareTo("Paused")==0 ) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tree_paused_16, 0, 0, 0);
         }
+        
         
         return convertView;
     }
@@ -149,8 +199,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int arg0, int arg1) {
         return true;
     }
-    void startAct(){
+    void startAct(String uid){
+    	// Need to attach the selected VM
+    	ServerCredentials.setSelectedVMId(uid);
     	Intent myIntent = new Intent(context, VMDetailsActivity.class);
     	context.startActivity(myIntent);
+    	this.storedUi.finish();
     }
 }

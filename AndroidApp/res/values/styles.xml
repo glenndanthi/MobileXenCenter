@@ -12,7 +12,22 @@
                 <item name="android:layout_height">44sp</item>
                 <item name="android:background">@drawable/toolbar_background</item>
         </style>
-
+        
+            <style name="ToolbarButtonLarge">
+                <item name="android:layout_width">65sp</item>
+                <item name="android:layout_height">44sp</item>
+                <item name="android:background">@drawable/toolbar_background</item>
+        </style>
+        <style name="ToolbarButtonSmall">
+                <item name="android:layout_width">40sp</item>
+                <item name="android:layout_height">44sp</item>
+                <item name="android:background">@drawable/toolbar_background</item>
+        </style>
+		<style name="ToolbarButtonLargest">
+                <item name="android:layout_width">72sp</item>
+                <item name="android:layout_height">44sp</item>
+                <item name="android:background">@drawable/toolbar_background</item>
+        </style>
         <style name="ToolbarButtonRight" parent="@style/ToolbarButton">
                 <item name="android:layout_alignParentRight">true</item>
         </style>
