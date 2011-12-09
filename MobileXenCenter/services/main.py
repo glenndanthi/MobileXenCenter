@@ -67,7 +67,7 @@ def getVMInfo(vm_uid):
             vmrec = session.xenapi.VM.get_record(vmref)
             vmInfo["name"] = vmrec["name_label"]
             vmInfo['description'] = vmrec["name_description"]
-            vmInfo["memory"] = int(vmrec["memory_target"])/1024/1024
+            vmInfo["memory"] = str(int(vmrec["memory_target"])/1024/1024)
             vmInfo['vcpuCount'] = vmrec["VCPUs_max"]
         except Failure as error:
             return str(error), 400
@@ -101,7 +101,7 @@ def startVm(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info']
+                result['errorInfo'] = str(task_record['error_info'])
 #            result['host'] = session.xenapi.host.get_name_label(task_record['resident_on'])
         except Failure as error:
             return str(error), 400
@@ -120,7 +120,7 @@ def stopVm(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info']
+                result['errorInfo'] = str(task_record['error_info'])
         except Failure as error:
             return str(error), 400
         return json.dumps(result)  
@@ -138,7 +138,7 @@ def resumeVm(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info']
+                result['errorInfo'] = str(task_record['error_info'])
         except Failure as error:
             return str(error), 400
         return json.dumps(result)  
@@ -156,7 +156,7 @@ def pause(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info']
+                result['errorInfo'] = str(task_record['error_info'])
         except Failure as error:
             return str(error), 400
         return json.dumps(result) 
@@ -174,7 +174,7 @@ def unpause(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info']
+                result['errorInfo'] = str(task_record['error_info'])
         except Failure as error:
             return str(error), 400
         return json.dumps(result) 
@@ -192,7 +192,7 @@ def suspend(vm_uid):
             task_record = session.xenapi.task.get_record(task)
             result['status'] = task_record['status']
             if task_record['status'] == "failure" :
-                result['errorInfo'] = task_record['error_info']
+                result['errorInfo'] = str(task_record['error_info'])
         except Failure as error:
             return str(error), 400
         return json.dumps(result) 
